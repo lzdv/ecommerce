@@ -1,0 +1,54 @@
+<?php
+/*
+ * This file is part of the Sonata package.
+ *
+ * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Sonata\PriceBundle;
+
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+/**
+ * @codeCoverageIgnore
+ */
+class SonataPriceBundle extends Bundle
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+        if (0 == $this->getBcScale()) {
+            $message = <<<CONTENT
+[%s]: You need to add a bcscale() method greater than 0 in your AppKernel.php to ensure that prices are correctly computed.
+Please refer to documentation: http://sonata-project.org/bundles/ecommerce/develop/doc/reference/bundles/price.html
+CONTENT;
+
+            throw new \RuntimeException(sprintf($message, $this->getName()));
+        }
+    }
+
+    /**
+     * Returns bcscale() setted value
+     *
+     * @return int
+     */
+    public function getBcScale()
+    {
+        $sqrt = bcsqrt('2');
+
+        return strlen(substr($sqrt, strpos($sqrt, '.') + 1));
+    }
+}
